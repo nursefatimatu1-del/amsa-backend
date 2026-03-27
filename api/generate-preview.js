@@ -16,24 +16,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + apiKey,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+   const response = await fetch(
+  https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey},
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [{ text: prompt }],
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
-      }
-    );
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 200,
+      },
+    }),
+  }
+);
 
-    const data = await response.json();
+   const data = await response.json();
+console.log("Gemini response:", data);
 
     const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
