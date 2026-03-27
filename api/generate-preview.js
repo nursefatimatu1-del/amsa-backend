@@ -26,7 +26,11 @@ module.exports = async (req, res) => {
         body: JSON.stringify({
           contents: [
             {
-              parts: [{ text: prompt }],
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
             },
           ],
         }),
@@ -36,13 +40,23 @@ module.exports = async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json(data);
+      return res.status(response.status).json({
+        error: "Gemini API request failed",
+        details: data,
+      });
     }
 
-    return res.status(200).json(data);
+    const text =
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini";
+
+    return res.status(200).json({
+      success: true,
+      text,
+    });
   } catch (error) {
     return res.status(500).json({
-      error: error.message || "Server error",
+      error: "Server error",
+      details: error.message,
     });
   }
 };
